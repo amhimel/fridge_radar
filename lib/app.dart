@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'features/home/home_page.dart';
 
 
 final _router = GoRouter(
   routes: [
-    GoRoute(path: '/', builder: (ctx, st) => const Placeholder()),
+    GoRoute(path: '/', builder: (ctx, st) => const HomePage()),
   ],
 );
 
@@ -19,6 +20,7 @@ class FridgeRadarApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       title: 'FridgeRadar',
+      debugShowCheckedModeBanner: false,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
       routerConfig: _router,
