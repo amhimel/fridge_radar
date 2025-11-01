@@ -1,0 +1,8 @@
+{
+  "@@locale": "bn",
+  "appTitle": "ফ্রিজ রাডার",
+  "welcome": "স্বাগতম",
+  "scanBarcode": "বারকোড স্ক্যান করুন",
+  "addItem": "আইটেম যোগ করুন",
+  "expiresInDays": "মেয়াদ শেষ হবে {days} দিনের মধ্যে"
+}

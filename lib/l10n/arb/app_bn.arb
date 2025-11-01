@@ -1,0 +1,8 @@
+{
+  "@@locale": "en",
+  "appTitle": "FridgeRadar",
+  "welcome": "Welcome",
+  "scanBarcode": "Scan barcode",
+  "addItem": "Add item",
+  "expiresInDays": "Expires in {days} days"
+}
