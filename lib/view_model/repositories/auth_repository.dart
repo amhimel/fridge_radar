@@ -4,11 +4,12 @@ import 'package:mime/mime.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/models/profile_model.dart';
 
+
 class AuthRepository {
   final _sb = Supabase.instance.client;
 
   /// Mobile deep link you added in Supabase → Auth → URL Configuration → Additional Redirect URLs
-  static const kEmailRedirect = 'io.quizacademy.app://auth-callback';
+  static const kEmailRedirect = 'io.fridge_rader.app//auth-callback';
 
   /// EXACT storage bucket id (rename if your bucket is 'avators', etc.)
   static const kAvatarBucket = 'profiles';
@@ -74,7 +75,7 @@ class AuthRepository {
           .from('profiles')
           .upsert({
             'id': user.id,
-            'email': email,
+            //'email': email,
             'display_name': displayName,
             'avatar_url': avatarUrl,
           }, onConflict: 'id')
@@ -99,7 +100,9 @@ class AuthRepository {
     // Ensure a minimal row exists (id/email)
     await _sb
         .from('profiles')
-        .upsert({'id': user.id, 'email': user.email}, onConflict: 'id')
+        .upsert({'id': user.id,
+      //'email': user.email
+    }, onConflict: 'id')
         .select()
         .single();
 
