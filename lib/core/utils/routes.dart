@@ -1,37 +1,37 @@
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart'; // 👈 add this
+import 'package:supabase_flutter/supabase_flutter.dart'; // auth gate
 
 import '../../features/auth/login_page.dart';
 import '../../features/auth/register_screen.dart';
 import '../../features/home/home_page.dart';
-// import '../../features/auth/register_page.dart'; // থাকলে আনকমেন্ট
+import '../../features/households/presentation/create_join_household_screen.dart';
+import '../../features/households/presentation/household_detail_screen.dart';
+import '../../features/households/presentation/join_code_autoload_screen.dart';
 
 class AppRoutes {
   static const String home = '/home';
   static const String login = '/login';
   static const String register = '/register';
+  static const String households = '/households';
+  static const String householdDetail = '/households/:id';
+  static const String joinCode = '/join/:code'; // optional deep link
 }
 
-// মিনিমাল, এক ফাইল রাউটার কনফিগ + auth redirect
 final router = GoRouter(
   initialLocation: AppRoutes.home,
 
-  // 👇 এখানে Supabase auth দেখে redirect হবে
+  // Auth-aware redirect
   redirect: (context, state) {
     final user = Supabase.instance.client.auth.currentUser;
 
-    final onLogin     = state.matchedLocation == AppRoutes.login;
-    final onRegister  = state.matchedLocation == AppRoutes.register;
+    final onLogin    = state.matchedLocation == AppRoutes.login;
+    final onRegister = state.matchedLocation == AppRoutes.register;
 
-    // Not signed in → কেবল login/register রুটে থাকতে দাও
     if (user == null) {
       return (onLogin || onRegister) ? null : AppRoutes.login;
     }
-
-    // Signed in → login/register গেলে home-এ পাঠাও
     if (onLogin || onRegister) return AppRoutes.home;
 
-    // নাহলে যেটা আছে সেটাই থাক
     return null;
   },
 
@@ -47,6 +47,27 @@ final router = GoRouter(
     GoRoute(
       path: AppRoutes.register,
       builder: (ctx, st) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.households,
+      name: 'households.createJoin',
+      builder: (ctx, st) => const CreateJoinHouseholdScreen(),
+    ),
+    GoRoute(
+      path: AppRoutes.householdDetail,
+      name: 'households.detail',
+      builder: (ctx, st) {
+        final id = st.pathParameters['id']!;
+        return HouseholdDetailScreen(householdId: id);
+      },
+    ),
+// /join/ABC123 → auto-join then redirect
+    GoRoute(
+      path: AppRoutes.joinCode,
+      name: 'households.joinCode',
+      builder: (ctx, st) => JoinCodeAutoloadScreen(
+        code: st.pathParameters['code']!,
+      ),
     ),
   ],
 );
