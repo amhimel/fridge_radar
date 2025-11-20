@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fridge_radar/common/widgets/app_input.dart';
-import '../../common/widgets/app_button.dart';
-import '../../view_model/providers/auth_providers.dart';
-import '../../view_model/providers/register_loading_provider.dart';
+
+import '../../../common/widgets/app_button.dart';
+import '../../../view_model/providers/auth_providers.dart';
+import '../../../view_model/providers/register_loading_provider.dart';
+
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});

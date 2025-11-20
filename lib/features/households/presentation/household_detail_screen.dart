@@ -1,11 +1,16 @@
 import 'dart:async';
+import 'dart:developer';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/utils/avatar.dart';
+import '../../items/presentation/fridge_items_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HouseholdDetailScreen extends StatefulWidget {
   final String householdId;
+
   const HouseholdDetailScreen({super.key, required this.householdId});
 
   @override
@@ -65,19 +70,108 @@ class _HouseholdDetailScreenState extends State<HouseholdDetailScreen> {
   Future<List<Map<String, dynamic>>> _fetchMembers() async {
     final supa = Supabase.instance.client;
     final List<dynamic> rows = await supa
-        .rpc('list_household_members', params: {'p_household_id': widget.householdId})
+        .rpc(
+          'list_household_members',
+          params: {'p_household_id': widget.householdId},
+        )
         .select();
     return rows.map((e) => (e as Map).cast<String, dynamic>()).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchFridges() async {
+    final supa = Supabase.instance.client;
+    final List<dynamic> rows = await supa
+        .from('fridges')
+        .select()
+        .eq('household_id', widget.householdId);
+
+    return rows.map((e) => (e as Map).cast<String, dynamic>()).toList();
+  }
+
+  Future<void> _createFridge(String name) async {
+    final supa = Supabase.instance.client;
+
+    try {
+      await supa.from('fridges').insert({
+        'household_id': widget.householdId,
+        'name': name,
+      });
+
+      if (!mounted) return;
+      setState(() {}); // refresh fridges list
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Fridge "$name" created')));
+    } catch (e) {
+      if (!mounted) return;
+      log("Add Fridge Error : $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error creating fridge: $e')));
+    }
+  }
+
+  void _openCreateFridgeSheet() {
+    final nameCtrl = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Add fridge', style: Theme.of(ctx).textTheme.titleLarge),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Name *',
+                  hintText: 'e.g. Main fridge',
+                ),
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () {
+                    final name = nameCtrl.text.trim();
+                    if (name.isEmpty) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        const SnackBar(content: Text('Name is required')),
+                      );
+                      return;
+                    }
+
+                    _createFridge(name);
+                    Navigator.of(ctx).pop();
+                  },
+                  child: const Text('Create'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _createInvite() async {
     final supa = Supabase.instance.client;
     try {
       final Map<String, dynamic> data = await supa
-          .rpc('create_household_invite', params: {
-        'p_household_id': widget.householdId,
-        'p_hours': 48,
-      })
+          .rpc(
+            'create_household_invite',
+            params: {'p_household_id': widget.householdId, 'p_hours': 48},
+          )
           .select()
           .single();
       setState(() => _invite = data);
@@ -94,9 +188,15 @@ class _HouseholdDetailScreenState extends State<HouseholdDetailScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Household')),
       body: FutureBuilder<Map<String, dynamic>>(
-        future: supa.from('households').select().eq('id', widget.householdId).single(),
+        future: supa
+            .from('households')
+            .select()
+            .eq('id', widget.householdId)
+            .single(),
         builder: (context, snapshot) {
-          final title = snapshot.data != null ? (snapshot.data!['name'] as String) : '…';
+          final title = snapshot.data != null
+              ? (snapshot.data!['name'] as String)
+              : '…';
 
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -122,7 +222,9 @@ class _HouseholdDetailScreenState extends State<HouseholdDetailScreen> {
                         );
                       },
                       icon: const Icon(Icons.copy),
-                      label: Text((_invite?['code'] as String?) ?? 'Invite code'),
+                      label: Text(
+                        (_invite?['code'] as String?) ?? 'Invite code',
+                      ),
                     ),
                 ],
               ),
@@ -148,13 +250,69 @@ class _HouseholdDetailScreenState extends State<HouseholdDetailScreen> {
                     children: members.map((m) {
                       final name = m['display_name'] as String? ?? 'Someone';
                       final avatarPath = m['avatar_url'] as String?;
-                      final avatarUrl  = _resolveAvatarUrl(avatarPath);
+                      final avatarUrl = _resolveAvatarUrl(avatarPath);
                       final role = (m['role'] as String).toUpperCase();
 
                       return ListTile(
                         leading: Avatar(name: name, url: avatarUrl),
                         title: Text(name),
                         subtitle: Text(role),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+
+              //fridge section
+              const SizedBox(height: 24),
+
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Fridges',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add),
+                    onPressed: _openCreateFridgeSheet,
+                    tooltip: 'Add fridge',
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              FutureBuilder<List<Map<String, dynamic>>>(
+                future: _fetchFridges(),
+                builder: (context, snap) {
+                  if (snap.connectionState == ConnectionState.waiting) {
+                    return const Padding(
+                      padding: EdgeInsets.all(24.0),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
+                  final fridges = snap.data ?? [];
+                  if (fridges.isEmpty) {
+                    return const Text('No fridges yet.');
+                  }
+
+                  return Column(
+                    children: fridges.map((f) {
+                      final id = f['id'] as String;
+                      final name = f['name'] as String? ?? 'Fridge';
+
+                      return ListTile(
+                        leading: const Icon(Icons.kitchen),
+                        title: Text(name),
+                        // 👇👇 HERE is where you use onTap + pushNamed
+                        onTap: () {
+                          context.pushNamed(
+                            'fridges.items', // route name from router
+                            pathParameters: {'id': id}, // fridge id
+                            extra: name, // fridgeName for AppBar
+                          );
+                        },
                       );
                     }).toList(),
                   );
@@ -168,45 +326,4 @@ class _HouseholdDetailScreenState extends State<HouseholdDetailScreen> {
   }
 }
 
-/// Small, resilient avatar widget (won’t crash on bad URLs; falls back to initials)
-class Avatar extends StatelessWidget {
-  const Avatar({super.key, required this.name, this.url, this.size = 22});
-  final String name;
-  final String? url;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    final initial = name.trim().isEmpty ? '?' : name.trim()[0].toUpperCase();
-
-    return SizedBox(
-      width: size * 2,
-      height: size * 2,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Base: initials (সবসময় থাকবে)
-          CircleAvatar(
-            radius: size,
-            child: Text(initial),
-          ),
-
-          // Overlay: network image (লোড হলে ইনিশিয়াল ঢেকে দেয়)
-          if (url != null && url!.isNotEmpty)
-            ClipOval(
-              child: Image.network(
-                url!,
-                width: size * 2,
-                height: size * 2,
-                fit: BoxFit.cover,
-                // ফেল করলে কিছুই না দেখালে নিচের ইনিশিয়ালই রয়ে যাবে
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                // চাইলে লোডিংয়ে হালকা ফেড/শিমার দিতে পারেন
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
 

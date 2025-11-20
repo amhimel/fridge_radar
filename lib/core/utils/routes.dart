@@ -1,12 +1,13 @@
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'; // auth gate
-
-import '../../features/auth/login_page.dart';
-import '../../features/auth/register_screen.dart';
+import '../../features/auth/presentation/login_page.dart';
+import '../../features/auth/presentation/register_screen.dart';
 import '../../features/home/home_page.dart';
 import '../../features/households/presentation/create_join_household_screen.dart';
 import '../../features/households/presentation/household_detail_screen.dart';
 import '../../features/households/presentation/join_code_autoload_screen.dart';
+import '../../features/items/presentation/fridge_items_page.dart';
+
 
 class AppRoutes {
   static const String home = '/home';
@@ -15,6 +16,7 @@ class AppRoutes {
   static const String households = '/households';
   static const String householdDetail = '/households/:id';
   static const String joinCode = '/join/:code'; // optional deep link
+  static const String fridgeItems = '/fridges/:id/items';
 }
 
 final router = GoRouter(
@@ -68,6 +70,19 @@ final router = GoRouter(
       builder: (ctx, st) => JoinCodeAutoloadScreen(
         code: st.pathParameters['code']!,
       ),
+    ),
+    GoRoute(
+      path: AppRoutes.fridgeItems,
+      name: 'fridges.items',
+      builder: (ctx, st) {
+        final id = st.pathParameters['id']!;
+        // we’ll pass the fridgeName through `extra`
+        final fridgeName = st.extra as String? ?? 'Fridge';
+        return FridgeItemsPage(
+          fridgeId: id,
+          fridgeName: fridgeName,
+        );
+      },
     ),
   ],
 );

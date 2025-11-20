@@ -97,12 +97,12 @@ class _HomePageState extends State<HomePage> {
         ),
       )),
 
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppRoutes.households),
-        icon: const Icon(Icons.group_add),
-        label: const Text('Create / Join'),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () => context.push(AppRoutes.households),
+      //   icon: const Icon(Icons.group_add),
+      //   label: const Text('Create / Join'),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

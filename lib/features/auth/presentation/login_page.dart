@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fridge_radar/common/widgets/app_input.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../common/widgets/app_button.dart';
+import '../../../common/widgets/app_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

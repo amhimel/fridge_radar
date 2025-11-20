@@ -171,19 +171,20 @@ class AuthRepository {
     final bytes = await file.readAsBytes();
     final mime = lookupMimeType(file.path) ?? 'image/jpeg';
 
-    // IMPORTANT: your storage policies must allow INSERT for authenticated users
     await _sb.storage
         .from(kAvatarBucket)
         .uploadBinary(
-          key,
-          bytes,
-          fileOptions: FileOptions(
-            upsert: true, // allow replace
-            contentType: mime, // set MIME
-          ),
-        );
+      key,
+      bytes,
+      fileOptions: FileOptions(
+        upsert: true,
+        contentType: mime,
+      ),
+    );
 
-    // For PUBLIC buckets:
-    return _sb.storage.from(kAvatarBucket).getPublicUrl(key);
+    // আগে: return public URL
+    // এখন: শুধু key (relative path) রিটার্ন করব
+    return key;   // উদাহরণ: "6c4f8d93-.../1700000000000.jpg"
   }
+
 }

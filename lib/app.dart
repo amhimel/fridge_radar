@@ -3,7 +3,7 @@ import 'package:fridge_radar/core/utils/routes.dart';
 import 'core/theme/app_theme.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'features/auth/login_page.dart';
+import 'features/auth/presentation/login_page.dart';
 import 'features/home/home_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
