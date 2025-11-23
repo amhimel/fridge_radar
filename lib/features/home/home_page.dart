@@ -6,6 +6,7 @@ import '../../core/utils/routes.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -23,6 +24,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _ensureProfile() async {
     final supa = Supabase.instance.client;
     final uid = supa.auth.currentUser!.id;
+    // প্রোফাইল row না থাকলেও যেন থাকে
     await supa.from('profiles').upsert({'id': uid});
   }
 
@@ -31,13 +33,22 @@ class _HomePageState extends State<HomePage> {
     setState(() => _loading = true);
     final supa = Supabase.instance.client;
 
-    await _ensureProfile();
+    try {
+      await _ensureProfile();
 
-    final List<dynamic> rows = await supa.rpc('list_my_households').select();
-    setState(() {
-      _households = rows.map((e) => (e as Map).cast<String, dynamic>()).toList();
-      _loading = false;
-    });
+      final List<dynamic> rows = await supa.rpc('list_my_households').select();
+      setState(() {
+        _households =
+            rows.map((e) => (e as Map).cast<String, dynamic>()).toList();
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load households: $e')),
+      );
+    }
   }
 
   // ---------- UI helpers ----------
@@ -52,7 +63,20 @@ class _HomePageState extends State<HomePage> {
     if (iso == null || iso.isEmpty) return null;
     try {
       final dt = DateTime.parse(iso).toLocal();
-      const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const m = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ];
       return '${m[dt.month - 1]} ${dt.day}';
     } catch (_) {
       return null;
@@ -77,7 +101,8 @@ class _HomePageState extends State<HomePage> {
           itemCount: _households.length,
           itemBuilder: (context, i) {
             final h = _households[i];
-            final name = (h['name'] as String?)?.trim().isNotEmpty == true
+            final name =
+            (h['name'] as String?)?.trim().isNotEmpty == true
                 ? (h['name'] as String)
                 : 'Unnamed household';
             final id = h['id'] as String;
@@ -86,7 +111,8 @@ class _HomePageState extends State<HomePage> {
 
             return _HouseholdCard(
               title: name,
-              subtitle: '${_shortId(id)}${when != null ? "  •  $when" : ""}',
+              subtitle:
+              '${_shortId(id)}${when != null ? "  •  $when" : ""}',
               leadingText: _initial(name),
               onTap: () => context.pushNamed(
                 'households.detail',
@@ -97,12 +123,12 @@ class _HomePageState extends State<HomePage> {
         ),
       )),
 
-      // floatingActionButton: FloatingActionButton.extended(
-      //   onPressed: () => context.push(AppRoutes.households),
-      //   icon: const Icon(Icons.group_add),
-      //   label: const Text('Create / Join'),
-      // ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push(AppRoutes.households),
+        icon: const Icon(Icons.group_add),
+        label: const Text('Create / Join'),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }
@@ -140,7 +166,8 @@ class _HouseholdCard extends StatelessWidget {
                 radius: 22,
                 child: Text(
                   leadingText,
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w600),
                 ),
               ),
               const SizedBox(width: 12),
@@ -152,7 +179,8 @@ class _HouseholdCard extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                      style: theme.textTheme.titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -167,7 +195,8 @@ class _HouseholdCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(Icons.chevron_right, color: theme.colorScheme.onSurfaceVariant),
+              Icon(Icons.chevron_right,
+                  color: theme.colorScheme.onSurfaceVariant),
             ],
           ),
         ),
@@ -190,10 +219,14 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.home_outlined, size: 72, color: theme.colorScheme.primary),
+            Icon(Icons.home_outlined,
+                size: 72, color: theme.colorScheme.primary),
             const SizedBox(height: 12),
-            Text('No households yet',
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'No households yet',
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 6),
             Text(
               'Create a new household or join with an invite code.',

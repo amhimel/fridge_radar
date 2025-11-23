@@ -45,7 +45,7 @@ dependencies:
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
   image_picker: ^1.1.2
-
+  mobile_scanner: ^5.1.1
 
 dev_dependencies:
   flutter_test:
