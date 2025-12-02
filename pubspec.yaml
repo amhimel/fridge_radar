@@ -38,7 +38,7 @@ dependencies:
   go_router: ^16.3.0
   flutter_riverpod: ^2.5.1
   supabase_flutter: ^2.10.3
-  flutter_local_notifications: ^19.5.0
+  flutter_local_notifications: ^17.1.2
   intl: ^0.20.2
   flutter_localizations:
     sdk: flutter
@@ -46,6 +46,7 @@ dependencies:
   json_annotation: ^4.9.0
   image_picker: ^1.1.2
   mobile_scanner: ^5.1.1
+  shared_preferences: ^2.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fridge_radar/notifications/notification_helper.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../../core/utils/routes.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,6 +20,11 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _load();
   }
+
+
+
+
+
 
   Future<void> _ensureProfile() async {
     final supa = Supabase.instance.client;
