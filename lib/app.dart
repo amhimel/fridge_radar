@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:fridge_radar/core/utils/routes.dart';
 import 'core/theme/app_theme.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'features/auth/presentation/login_page.dart';
-import 'features/home/home_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-
-
 
 class FridgeRadarApp extends ConsumerStatefulWidget {
   const FridgeRadarApp({super.key});
@@ -19,6 +13,20 @@ class FridgeRadarApp extends ConsumerStatefulWidget {
 }
 
 class _FridgeRadarAppState extends ConsumerState<FridgeRadarApp> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initialization();
+  }
+  void initialization() async {
+    // Any initialization code can go here
+    // remove splash after first frame
+    print("Pausing......");
+    Future.delayed( const Duration(seconds: 3));
+    print("Unpausing......");
+    FlutterNativeSplash.remove();
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -34,7 +42,6 @@ class _FridgeRadarAppState extends ConsumerState<FridgeRadarApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-
     );
   }
 }

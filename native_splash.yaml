@@ -1,0 +1,11 @@
+flutter_native_splash:
+  #specific platform:
+  android: true
+  ios: true
+  web: false
+  color: "#2DD4BF"
+  image: "assets/logo/fridge_radar.png"
+  fullscreen: true
+  android_12:
+    color: "#2DD4BF"
+    image: "assets/logo/fridge_radar.png"

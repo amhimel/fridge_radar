@@ -1,5 +1,5 @@
 import 'dart:developer';
-
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -12,7 +12,7 @@ import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   // lock orientation
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -51,5 +51,6 @@ Future<void> main() async {
     remindHour: 9,
     remindMinute: 0,
   );
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(const ProviderScope(child: FridgeRadarApp()));
 }
