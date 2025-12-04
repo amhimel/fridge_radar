@@ -43,12 +43,8 @@ A smart food-management system that tracks fridge items, monitors expiration dat
 ---
 
 ## 🎥 Demo
-<p><img src="./assets/demo.gif" width="420" alt="Quiz Academy demo GIF"/></p>
+<p><img src="./screenshots/demo.gif" width="420" alt="Quiz Academy demo GIF"/></p>
 
-
-<video src="./screenshots/video.mp4" controls muted playsinline width="420"></video>
-
-> If the player doesn’t render on some GitHub clients, you can **[download the video here](./screenshots/video.mp4)**.
 
 ## 🧱 Tech Stack
 
