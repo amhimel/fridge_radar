@@ -70,14 +70,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF3EBDD),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            'Login Screen',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
+        title: Text(
+          'Login Screen',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
       body: SafeArea(

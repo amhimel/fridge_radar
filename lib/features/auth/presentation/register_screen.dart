@@ -10,7 +10,6 @@ import '../../../common/widgets/app_button.dart';
 import '../../../view_model/providers/auth_providers.dart';
 import '../../../view_model/providers/register_loading_provider.dart';
 
-
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -42,7 +41,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _pickAvatar() async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+    );
     if (picked != null) {
       setState(() => _avatarFile = File(picked.path));
     }
@@ -70,28 +72,42 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     String? emailErr, passErr, confirmErr;
     final re = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
     if (email.isEmpty || !re.hasMatch(email)) emailErr = 'Enter a valid email';
-    if (pass.isEmpty || pass.length < 6) passErr = 'Password must be at least 6 characters';
+    if (pass.isEmpty || pass.length < 6)
+      passErr = 'Password must be at least 6 characters';
     if (confirm.isEmpty) {
       confirmErr = 'Confirm your password';
-    } else if (confirm != pass) {confirmErr = 'Passwords do not match';}
+    } else if (confirm != pass) {
+      confirmErr = 'Passwords do not match';
+    }
 
-    final firstError = [emailErr, passErr, confirmErr].whereType<String>().firstOrNull;
-    if (firstError != null) { _showSnack(firstError); return; }
+    final firstError = [
+      emailErr,
+      passErr,
+      confirmErr,
+    ].whereType<String>().firstOrNull;
+    if (firstError != null) {
+      _showSnack(firstError);
+      return;
+    }
 
     final loading = ref.read(registerLoadingProvider.notifier);
     loading.state = true;
 
     try {
       // ⬇️ Use the avatar-enabled register here
-      await ref.read(authControllerProvider).register(
-        email,
-        pass,
-        displayName: name,
-        avatarFile: _avatarFile, // File? you set via ImagePicker
-      );
+      await ref
+          .read(authControllerProvider)
+          .register(
+            email,
+            pass,
+            displayName: name,
+            avatarFile: _avatarFile, // File? you set via ImagePicker
+          );
 
       // Optional: try to sign in immediately (works if email verification is off)
-      try { await ref.read(authControllerProvider).login(email, pass); } catch (_) {}
+      try {
+        await ref.read(authControllerProvider).login(email, pass);
+      } catch (_) {}
 
       if (!mounted) return;
       context.go('/home');
@@ -109,8 +125,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF3EBDD),
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: const Text(
+          'Register Screen',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
       ),
       body: SafeArea(
         child: Center(
@@ -136,7 +154,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         CircleAvatar(
                           radius: 44,
                           backgroundColor: Colors.white,
-                          backgroundImage: _avatarFile != null ? FileImage(_avatarFile!) : null,
+                          backgroundImage: _avatarFile != null
+                              ? FileImage(_avatarFile!)
+                              : null,
                           child: _avatarFile == null
                               ? const Icon(Icons.person, size: 40)
                               : null,
@@ -196,7 +216,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                   const SizedBox(height: 12),
                   TextButton(
-                    onPressed: isRegistering ? null : () => context.go('/login'),
+                    onPressed: isRegistering
+                        ? null
+                        : () => context.go('/login'),
                     child: const Text('Already have an account? Login Now'),
                   ),
                 ],
